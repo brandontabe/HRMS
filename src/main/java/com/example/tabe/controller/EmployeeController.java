@@ -1,5 +1,6 @@
 package com.example.tabe.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,25 +19,48 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.tabe.model.people.Employee;
-import com.example.tabe.model.people.Person;
-import com.example.tabe.service.EmployeeService;
+import com.example.tabe.model.people.User;
+import com.example.tabe.repository.EmployeeRepository;
+import com.example.tabe.repository.UserRepository;
 
 @Component
 @RestController
+@CrossOrigin
 @RequestMapping(path = "/hrms/")
 public class EmployeeController {
 
 @Autowired
-EmployeeService employeeService;
+EmployeeRepository employeeService;
 
-@GetMapping (path = "/test/")
-public String test() {
+@Autowired
+UserRepository userRepo;
+
+@CrossOrigin
+@PostMapping (path = "/login/")
+public boolean test(@Valid @RequestBody User user) {
+	boolean userLock=false;
+	List <User> users = new ArrayList<User>();
+
+	users= userRepo.findAll();
 	
-	return "hello wold";
+	for(User u : users) {
+		
+		if(u.getEmail().equals(user.getEmail()) && u.getPassword().equals(user.getPassword())) {
+			userLock=true;
+			user.setActive(true);
+			u.setActive(true);
+		}
+		
+		else {
+			user.setActive(false);
+			u.setActive(false);
+		}
+	}
+return userLock;
 }
 
 @PostMapping(path = "/addEmployee")
-public String AddEmployee(@Valid @RequestBody Person employee){
+public String AddEmployee(@Valid @RequestBody Employee employee){
 
 employeeService.save(employee);
 
@@ -52,9 +76,9 @@ public String deleteEmployee(@PathVariable long id){
 
 @CrossOrigin
 @GetMapping(path = "/listEmployees")
-public List<Person> listEmployees(){
+public List<Employee> listEmployees(){
 	System.out.println("debug mode");
-    List <Person> empArr = (List<Person>) employeeService.findAll();
+    List <Employee> empArr = (List<Employee>) employeeService.findAll();
     return empArr;
 }
 
@@ -62,20 +86,20 @@ public List<Person> listEmployees(){
 
 @CrossOrigin
 @GetMapping(path = "/findEmployee/{id}")
-public Optional <Person> findEmployeeById(@PathVariable long id){
+public Optional <Employee> findEmployeeById(@PathVariable long id){
      
-        Optional<Person> emp = employeeService.findById(id);
+        Optional<Employee> emp = employeeService.findById(id);
     
     return emp;
 }
 
 	@CrossOrigin
 	@PutMapping(path = "/updateEmployee")
-	public Boolean updateEmployee(@RequestBody Person emp) {
-		Optional<Person> employee = employeeService.findById(emp.getId());
+	public Boolean updateEmployee(@RequestBody Employee emp) {
+		Optional<Employee> employee = employeeService.findById(emp.getId());
 		System.out.println(".............................."+emp);
 		if (employee.isPresent()) {
-			Person updatedEmployee = employee.get();
+			Employee updatedEmployee = employee.get();
 			// updatedTask.setDescription(task.getDescription());
 			// updatedTask.setDueDate(task.getDueDate());
 			employeeService.save(updatedEmployee);
@@ -83,6 +107,12 @@ public Optional <Person> findEmployeeById(@PathVariable long id){
 		}
 		return false;
 	}
+	
+	}
+	
+	
 
-    
-}
+	
+	
+	
+

@@ -36,7 +36,7 @@
 	<div class="limiter">
 		<div class="container-login100">
 			<div class="wrap-login100">
-				<form class="login100-form validate-form">
+				<form id="login" action="POST" class="login100-form validate-form">
 					<span class="login100-form-title p-b-43">
 						Login to continue
 					</span>
@@ -68,7 +68,7 @@
 			
 
 					<div class="container-login100-form-btn">
-						<button class="login100-form-btn" onclick="collectLogin(); return false;">
+						 <button type="submit"  class="login100-form-btn" >
 							Login
 						</button>
 					</div>
@@ -120,5 +120,47 @@
 <!--===============================================================================================-->
 	<script src="js/main.js"></script>
 
+  <script>
+  
+  function mine(status){
+	  if(status==true){
+    	 console.log("right");
+		   window.location.replace("dashboard/index.html");
+      } else{
+    	  console.log("wrong");
+      }
+  }
+  
+    $("#login").submit(function (event) {
+      event.preventDefault();
+      email = $("#email").val();
+      password = $("#password").val();
+
+      var login = {
+        email: email,
+        password: password,
+      };
+
+      console.log(email);
+      $.ajax({
+        url: 'http://localhost:8080/hrms/login/',
+        dataType: 'json',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(login),
+        success: function (data, textStatus, jQxhr) {
+          password = $("#password").val('');
+          email = $("#email").val('');
+          console.log(data);
+          mine(data);
+        },
+        error: function (jqXhr, textStatus, errorThrown) {
+          console.log(errorThrown);
+        }
+      });
+
+    });
+  </script>
+ 
 </body>
 </html>
