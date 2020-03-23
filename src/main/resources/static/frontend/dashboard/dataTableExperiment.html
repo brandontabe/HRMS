@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Page Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="assets/img/brand/favicon.png" rel="icon" type="image/png">
+
+	<!-- Fonts -->
+	<link href="https://fonts.googleapis.com/css?family=Nunito:300,400,600,700,800" rel="stylesheet">
+
+	<!-- Icons -->
+	<link href="assets/css/icons.css" rel="stylesheet">
+
+	<!--Bootstrap.min css-->
+	<link rel="stylesheet" href="assets/plugins/bootstrap/css/bootstrap.min.css">
+
+	<!-- Ansta CSS -->
+	<link href="assets/css/dashboard.css" rel="stylesheet" type="text/css">
+
+	<!-- Data table css -->
+	<link href="assets/plugins/datatable/dataTables.bootstrap4.min.css" rel="stylesheet" />
+
+	<!-- Custom scroll bar css-->
+	<link href="assets/plugins/customscroll/jquery.mCustomScrollbar.css" rel="stylesheet" />
+
+	<!-- Sidemenu Css -->
+	<link href="assets/plugins/toggle-sidebar/css/sidemenu.css" rel="stylesheet">
+
+
+
+</head>
+
+<body>
+
+    <section>
+        <!--for demo wrap-->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card shadow">
+                    <div class="card-header">
+                        <h2 class="mb-0">Data Table</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">        <div class="tbl-header">
+            <table id="example" class="table table-striped table-bordered w-100 text-nowrap">
+                <thead>
+                    <tr>
+                        <th class="wd-15p">First name</th>
+                        <th class="wd-15p">Last name</th>
+                        <th class="wd-20p">Position</th>
+                        <th class="wd-15p">Start date</th>
+                        <th class="wd-10p">Salary</th>
+                        <th class="wd-25p">E-mail</th>
+                    </tr>
+                </thead>
+            </table>
+
+        </div>
+        <div class="tbl-content">
+            <table cellpadding="0" cellspacing="1" border="0" id="employeetable">
+                <tbody>
+
+
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+
+
+  
+
+
+
+    <!-- Modal -->
+    <div class="modal fade" id="taskModalUpdate" tabindex="-1" role="dialog" aria-labelledby="taskModalUpdateTitle"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="taskTitle">Update Task</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form></form>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <input name="id" id="id" class="form-control" id="id" type="hidden" />
+                    </div>
+                    <div class="form-group">
+                        <label for="dueDate">Due Date</label>
+                        <input name="dueDate" id="dueDate" class="form-control" id="dueDate" type="date" />
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="4" id="description"
+                            placeholder="Project Description"></textarea>
+                    </div>
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="overdue">
+                        <label class="form-check-label" for="overdue">Overdue</label>
+                    </div>
+                </div>
+                </form>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="updateTaskById()">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="assets/plugins/jquery/dist/jquery.min.js"></script>
+	<script src="assets/js/popper.js"></script>
+	<script src="assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+
+	<!-- Optional JS -->
+	<script src="assets/plugins/chart.js/dist/Chart.min.js"></script>
+	<script src="assets/plugins/chart.js/dist/Chart.extension.js"></script>
+
+	<!-- Data tables -->
+	<script src="assets/plugins/datatable/jquery.dataTables.min.js"></script>
+	<script src="assets/plugins/datatable/dataTables.bootstrap4.min.js"></script>
+
+	<!-- Fullside-menu Js-->
+	<script src="assets/plugins/toggle-sidebar/js/sidemenu.js"></script>
+
+	<!-- Custom scroll bar Js-->
+	<script src="assets/plugins/customscroll/jquery.mCustomScrollbar.concat.min.js"></script>
+
+	<!-- Ansta JS -->
+	<script src="assets/js/custom.js"></script>
+   
+        
+
+    <script>
+
+$(document).ready(function () {
+    getAllEmployees(true);
+});
+        
+    function drawRow(rowData) {
+    var row = $("<tr />")
+    $("#employeetable").append(row); //this will append tr element to table... keep its reference for a while since we will add cels into it
+    row.append($("<td>" + rowData.name + "</td>"));
+    row.append($("<td>" + rowData.lastName + "</td>"));
+    row.append($("<td>" + rowData.title + "</td>"));
+    //row.append($(`<td><a href="http://localhost:9000/v1/task/remove/${rowData.id}"><i class="fa fa-trash-o" style="font-size:15px;color:red"></i></a></td>`));
+}
+
+function drawTable(data) {
+    for (var i = 0; i < data.length; i++) {
+        drawRow(data[i]);
+    }
+
+    
+}
+
+function getAllEmployees(draw) {
+    $.ajax({
+        url: 'http://localhost:8080/hrms/listEmployees',
+        dataType: 'json',
+        type: 'GET',
+        contentType: 'application/json',
+
+        success: function (data, textStatus, jQxhr) {
+            if (draw) {
+                drawTable(data);
+            }
+        },
+        error: function (jqXhr, textStatus, errorThrown) {
+            console.log(errorThrown);
+        }
+    });
+}
+
+</script>
+
+
+    </script>
+
+</body>
+
+</html>

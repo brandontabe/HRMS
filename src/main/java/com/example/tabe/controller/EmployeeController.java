@@ -25,94 +25,80 @@ import com.example.tabe.repository.UserRepository;
 
 @Component
 @RestController
-@CrossOrigin
 @RequestMapping(path = "/hrms/")
 public class EmployeeController {
 
-@Autowired
-EmployeeRepository employeeService;
+	@Autowired
+	EmployeeRepository employeeService;
 
-@Autowired
-UserRepository userRepo;
+	@Autowired
+	UserRepository userRepo;
 
-@CrossOrigin
-@PostMapping (path = "/login/")
-public boolean test(@Valid @RequestBody User user) {
-	boolean userLock=false;
-	List <User> users = new ArrayList<User>();
+	@CrossOrigin
+	@PostMapping(path = "/login/")
+	public boolean test(@Valid @RequestBody User user) {
+		boolean userLock = false;
+		List<User> users = new ArrayList<User>();
 
-	users= userRepo.findAll();
-	
-	for(User u : users) {
-		
-		if(u.getEmail().equals(user.getEmail()) && u.getPassword().equals(user.getPassword())) {
-			userLock=true;
-			user.setActive(true);
-			u.setActive(true);
+		users = userRepo.findAll();
+
+		for (User u : users) {
+
+			if (u.getEmail().equals(user.getEmail()) && u.getPassword().equals(user.getPassword())) {
+				userLock = true;
+				user.setActive(true);
+				u.setActive(true);
+			}
+
+			else {
+				user.setActive(false);
+				u.setActive(false);
+			}
 		}
-		
-		else {
-			user.setActive(false);
-			u.setActive(false);
-		}
+		return userLock;
 	}
-return userLock;
-}
 
-@PostMapping(path = "/addEmployee")
-public String AddEmployee(@Valid @RequestBody Employee employee){
+	@CrossOrigin
+	@PostMapping(path = "/addEmployee")
+	public Employee AddEmployee(@Valid @RequestBody Employee employee) {
+		employeeService.save(employee);
+		return employee;
+	}
 
-employeeService.save(employee);
+	@CrossOrigin
+	@DeleteMapping(path = "/deleteEmployee/{id}")
+	public String deleteEmployee(@PathVariable long id) {
+		employeeService.deleteById(id);
+		return "Employee deleted";
+	}
 
-    return "NEW EMPLOYEE ADDED";
-}
+	@CrossOrigin
+	@GetMapping(path = "/listEmployees")
+	public List<Employee> listEmployees() {
+		List<Employee> empArr = (List<Employee>) employeeService.findAll();
+		return empArr;
+	}
 
-@CrossOrigin
-@DeleteMapping(path = "/deleteEmployee/{id}")
-public String deleteEmployee(@PathVariable long id){
-    employeeService.deleteById(id);
-    return "Employee deleted";
-}
+	@CrossOrigin
+	@GetMapping(path = "/findEmployee/{id}")
+	public Optional<Employee> findEmployeeById(@PathVariable long id) {
 
-@CrossOrigin
-@GetMapping(path = "/listEmployees")
-public List<Employee> listEmployees(){
-	System.out.println("debug mode");
-    List <Employee> empArr = (List<Employee>) employeeService.findAll();
-    return empArr;
-}
+		Optional<Employee> emp = employeeService.findById(id);
 
-
-
-@CrossOrigin
-@GetMapping(path = "/findEmployee/{id}")
-public Optional <Employee> findEmployeeById(@PathVariable long id){
-     
-        Optional<Employee> emp = employeeService.findById(id);
-    
-    return emp;
-}
+		return emp;
+	}
 
 	@CrossOrigin
 	@PutMapping(path = "/updateEmployee")
 	public Boolean updateEmployee(@RequestBody Employee emp) {
 		Optional<Employee> employee = employeeService.findById(emp.getId());
-		System.out.println(".............................."+emp);
+		System.out.println(".............................." + emp);
 		if (employee.isPresent()) {
 			Employee updatedEmployee = employee.get();
-			// updatedTask.setDescription(task.getDescription());
-			// updatedTask.setDueDate(task.getDueDate());
 			employeeService.save(updatedEmployee);
 			return true;
 		}
 		return false;
 	}
-	
-	}
-	
-	
 
-	
-	
-	
-
+}
